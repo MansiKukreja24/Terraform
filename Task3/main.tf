@@ -4,20 +4,6 @@ provider "aws" {
   profile = "default"
 }
 
-resource "aws_db_instance" "mysql" {
-  allocated_storage      = 20
-  engine                 = "mysql"
-  engine_version         = "5.7"
-  instance_class         = "db.t2.micro"
-  name                   = var.dbname
-  username               = var.username
-  password               = var.password
-  parameter_group_name   = "default.mysql5.7"
-  security_groups = ["web1-security-group"]
-  db_subnet_group_name   = aws_db_subnet_group.mysql.name
-  skip_final_snapshot    = true
-}
-
 resource "aws_instance" "ec2" {
   ami = "ami-011c99152163a87ae"
   instance_type = "t2.micro"
@@ -39,13 +25,26 @@ resource "aws_instance" "ec2" {
 
  provisioner "remote-exec"​ {
     inline = [
-      "sudo yum install http -y"​,
-      "sudo yum install php -y"​,
-      "sudo systemctl start httpd"​,
-      "sudo systemctl start php"​,
-      "cd /var/www/html"​,
-      "sudo wget https://wordpress.org/latest.zip"​,
-      "sudo unzip latest.zip"​
+      "sudo yum install http -y",
+      "sudo yum install php -y",
+      "sudo systemctl start httpd",
+      "sudo systemctl start php",
+      "cd /var/www/html",
+      "sudo wget https://wordpress.org/latest.zip",
+      "sudo unzip latest.zip"
     ]
   }
+}
+  resource "aws_db_instance" "mysql" {
+  allocated_storage      = 20
+  engine                 = "mysql"
+  engine_version         = "5.7"
+  instance_class         = "db.t2.micro"
+  name                   = var.dbname
+  username               = var.username
+  password               = var.password
+  parameter_group_name   = "default.mysql5.7"
+  security_groups = ["web1-security-group"]
+  db_subnet_group_name   = aws_db_subnet_group.mysql.name
+  skip_final_snapshot    = true
 }
