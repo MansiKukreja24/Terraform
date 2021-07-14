@@ -27,40 +27,25 @@ resource "aws_instance" "ec2" {
 
   key_name = "devops"
   security_groups = ["web1-security-group"]
-  associate_public_ip_address = true
-
-  user_data = file("script.sh")
-
-  tags = {
-    Name = "EC2 Instance"
+  
+  resource "null_resource". "test1" {
+ connection {
+    type     = "ssh"
+    user     = "ec2-user"
+    private_key = file("C:/Users/Aakash/Downloads/devops.pem"​)
+    host     = aws_instance.ec2.public_ip
   }
 
-  provisioner "file" {
-    source      = "script.sh"
-    destination = "/tmp/script.sh"
 
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      private_key = file("C:/Users/mansi/Downloads/devops.pem")
-      host = aws_instance.ec2.public_ip
-    }
-  }
-
-  provisioner "remote-exec" {
+ provisioner "remote-exec"​ {
     inline = [
-      "chmod +x /tmp/script.sh",
-      "/tmp/script.sh",
+      "sudo yum install http -y"​,
+      "sudo yum install php -y"​,
+      "sudo systemctl start httpd"​,
+      "sudo systemctl start php"​,
+      "cd /var/www/html"​,
+      "sudo wget https://wordpress.org/latest.zip"​,
+      "sudo unzip latest.zip"​
     ]
-
-    connection {
-      type        = "ssh"
-      user        = "ec2-user"
-      private_key = file("C:/Users/mansi/Downloads/devops.pem")
-      host = aws_instance.ec2.public_ip
-    }
-  }
-  timeouts {
-    create = "20m"
   }
 }
